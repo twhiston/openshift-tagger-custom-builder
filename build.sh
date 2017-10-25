@@ -4,12 +4,15 @@
 # - retrieves an id from a specified label
 # - tag this image with the id
 
-set -x # debug
 set -e # fail fast
 set -o pipefail
 IFS=$'\n\t'
 
-env | sort
+
+if [[ -v $DEBUG ]]; then
+    set -x # debug
+    env | sort
+fi
 
 if [ -z "$BUILD_NAMESPACE" ]; then
     BUILD_NAMESPACE=$(eval cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
