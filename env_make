@@ -1,4 +1,5 @@
 NS = tomwhiston
 REPO = openshift-image-tagger
 NAME = openshift-image-tagger
+VERSION = latest
 INSTANCE = head

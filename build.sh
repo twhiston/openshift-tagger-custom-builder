@@ -15,8 +15,8 @@ if [ -n "${BUILD_NAMESPACE}" ]; then
     BUILD_NAMESPACE=$(eval cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
 fi
 
-echo $BUILD_NAMESPACE
-echo $BUILD_IMAGE
+echo "Build Namespace: ${BUILD_NAMESPACE}"
+echo "Build Image: ${BUILD_IMAGE}"
 
 
 if [ -z "$TOKEN" ]; then

@@ -11,6 +11,9 @@ cf https://trello.com/c/nOX8FTRq/686-5-support-multiple-tags-for-a-build-output
 
 ## How it works
 
+If you don't explicitly add a token to connect then it will connect as the builder an you will need to ensure that the builder can see and edit your project
+`oc policy add-role-to-user edit system:serviceaccount:drupal-module-tester:builder`
+
 ## Run it locally
 
 ```
