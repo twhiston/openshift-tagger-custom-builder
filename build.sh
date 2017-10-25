@@ -36,6 +36,7 @@ oc tag $BUILD_IMAGE:latest $BUILD_IMAGE:$COMMIT_ID -n $BUILD_NAMESPACE
 
 if [ "$PUSH_IMAGE" = true ] ; then
     echo "Pushing Image"
+    docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
     docker push $BUILD_IMAGE:$COMMIT_ID
 fi
 
