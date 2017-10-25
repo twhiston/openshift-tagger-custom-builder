@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # This script :
-# - retrieves the commit id from the last image built
-# - tag this image with the commit id
+# - retrieves an id from a specified label
+# - tag this image with the id
 
 set -x # debug
 set -e # fail fast
@@ -11,15 +11,22 @@ IFS=$'\n\t'
 
 env | sort
 
-echo $TOKEN
+if [ -n "${BUILD_NAMESPACE}" ]; then
+    BUILD_NAMESPACE=$(eval cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+fi
+
 echo $BUILD_NAMESPACE
 echo $BUILD_IMAGE
-echo $OPENSHIFT_INSTANCE
+
 
 if [ -z "$TOKEN" ]; then
   TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
 fi
 
-oc login --token=$TOKEN --server=$OPENSHIFT_INSTANCE
+oc login https://$KUBERNETES_PORT_443_TCP_ADDR:$KUBERNETES_SERVICE_PORT_HTTPS \
+  --token `cat /var/run/secrets/kubernetes.io/serviceaccount/token` \
+  --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
 COMMIT_ID=$(oc get istag $BUILD_IMAGE:latest -o json -n $BUILD_NAMESPACE | jq -r ".image.dockerImageMetadata.Config.Labels.\"io.openshift.build.commit.id\"")
 oc tag $BUILD_IMAGE:latest $BUILD_IMAGE:$COMMIT_ID -n $BUILD_NAMESPACE
+docker push $BUILD_IMAGE:$COMMIT_ID
