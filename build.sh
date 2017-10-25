@@ -31,12 +31,8 @@ fi
 
 if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e /root/.docker ]]; then
   echo "Using push secret"
-  mkdir -p /root/.docker
-  cp "$PUSH_DOCKERCFG_PATH"/.dockerconfigjson /root/.docker/config.json
-  cat /root/.docker/config.json
-  ls -la /root/.docker
-  chmod 644 /root/.docker/config.json
-  ls -la /root/.docker
+  mkdir -p ~/.docker
+  cp "$PUSH_DOCKERCFG_PATH"/.dockerconfigjson ~/.docker/config.json
 fi
 
 if [ -n "${SOURCE_REF}" ]; then
@@ -58,14 +54,14 @@ else
   docker build --rm -t "${TAG}" "${SOURCE_REPOSITORY}"
 fi
 
-if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
+if [ -n "${OUTPUT_IMAGE}" ] || [ -s "~/.dockercfg" ]; then
   docker version
   #docker --debug login -u "${DOCKER_USER}" -p "${DOCKER_PASS}" "${OUTPUT_REGISTRY}"
   if [ -n "${BUILD_TAG}" ]; then
     BUILD_TAG_FINAL="${TAG}:${BUILD_TAG}"
     echo "Retagging image as ${BUILD_TAG_FINAL}"
     docker tag "${TAG}" "${BUILD_TAG_FINAL}"
-    docker --debug --config="/root/.dockercfg" push "${BUILD_TAG_FINAL}"
+    docker --debug  push "${BUILD_TAG_FINAL}"
   fi
-  docker --debug --config="/root/.dockercfg" push "${TAG}"
+  docker --debug push "${TAG}"
 fi
