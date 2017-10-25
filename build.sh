@@ -44,7 +44,7 @@ else
   docker build --rm -t "${TAG}" "${SOURCE_REPOSITORY}"
 fi
 
-cp ${PUSH_DOCKERCFG_PATH} /root/.dockercfg
+cp ${PUSH_DOCKERCFG_PATH}/ /root/.dockercfg
 
 if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
   docker push "${TAG}"
