@@ -50,7 +50,7 @@ fi
 
 if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e /root/.dockercfg ]]; then
   echo "Using push secret"
-  cp /var/run/secrets/openshift.io/push/.dockercfg /root/.dockercfg
+  cp "$PUSH_DOCKERCFG_PATH"/.dockercfg /root/.dockercfg
 fi
 
 if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
