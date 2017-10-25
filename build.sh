@@ -1,44 +1,59 @@
 #!/bin/bash
-
-# This script :
-# - retrieves an id from a specified label
-# - tag this image with the id
-
-set -e # fail fast
 set -o pipefail
 IFS=$'\n\t'
 
+DOCKER_SOCKET=/var/run/docker.sock
 
-if [[ -v $DEBUG ]]; then
-    set -x # debug
-    env | sort
+if [ ! -e "${DOCKER_SOCKET}" ]; then
+  echo "Docker socket missing at ${DOCKER_SOCKET}"
+  exit 1
 fi
 
-if [ -z "$BUILD_NAMESPACE" ]; then
-    BUILD_NAMESPACE=$(eval cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+if [ -n "${OUTPUT_IMAGE}" ]; then
+  TAG="${OUTPUT_REGISTRY}/${OUTPUT_IMAGE}"
 fi
 
-echo "Build Namespace: ${BUILD_NAMESPACE}"
-echo "Build Image: ${BUILD_IMAGE}"
-
-
-if [ -z "$TOKEN" ]; then
-  TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+if [[ "${SOURCE_REPOSITORY}" != "git://"* ]] && [[ "${SOURCE_REPOSITORY}" != "git@"* ]]; then
+  URL="${SOURCE_REPOSITORY}"
+  if [[ "${URL}" != "http://"* ]] && [[ "${URL}" != "https://"* ]]; then
+    URL="https://${URL}"
+  fi
+  curl --head --silent --fail --location --max-time 16 $URL > /dev/null
+  if [ $? != 0 ]; then
+    echo "Could not access source url: ${SOURCE_REPOSITORY}"
+    exit 1
+  fi
 fi
 
-oc login https://$KUBERNETES_PORT_443_TCP_ADDR:$KUBERNETES_SERVICE_PORT_HTTPS \
-  --token `cat /var/run/secrets/kubernetes.io/serviceaccount/token` \
-  --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-
-COMMIT_ID=$(oc get istag $BUILD_IMAGE:latest -o json -n $BUILD_NAMESPACE | jq -r ".image.dockerImageMetadata.Config.Labels.\"io.openshift.build.commit.id\"")
-oc tag $BUILD_IMAGE:latest $BUILD_IMAGE:$COMMIT_ID -n $BUILD_NAMESPACE
-
-
-if [ "$PUSH_IMAGE" = true ] ; then
-    echo "Pushing Image"
-    if [[ -v $DEBUG ]]; then
-        echo "Docker Socket: ${DOCKER_SOCKET}"
-    fi
-    docker -H "${DOCKER_SOCKET}" push $BUILD_IMAGE:$COMMIT_ID
+if [ -n "${SOURCE_REF}" ]; then
+  BUILD_DIR=$(mktemp --directory)
+  git clone --recursive "${SOURCE_REPOSITORY}" "${BUILD_DIR}"
+  if [ $? != 0 ]; then
+    echo "Error trying to fetch git source: ${SOURCE_REPOSITORY}"
+    exit 1
+  fi
+  pushd "${BUILD_DIR}"
+  git checkout "${SOURCE_REF}"
+  if [ $? != 0 ]; then
+    echo "Error trying to checkout branch: ${SOURCE_REF}"
+    exit 1
+  fi
+  popd
+  docker build --rm -t "${TAG}" "${BUILD_DIR}"
+else
+  docker build --rm -t "${TAG}" "${SOURCE_REPOSITORY}"
 fi
 
+if [[ -d /var/run/secrets/openshift.io/push ]] && [[ ! -e /root/.dockercfg ]]; then
+  cp /var/run/secrets/openshift.io/push/.dockercfg /root/.dockercfg
+fi
+
+if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
+  docker push "${TAG}"
+  if [ -n "${BUILD_TAG}" ]; then
+    BUILDTAG="${TAG}:${BUILD_TAG}"
+    docker tag "${TAG}" "${BUILD_TAG}"
+    docker push "${BUILD_TAG}"
+    docker rmi "${BUILD_TAG}"
+  fi
+fi
