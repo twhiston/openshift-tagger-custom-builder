@@ -10,7 +10,8 @@ RUN yum install -y --enablerepo=centosplus epel-release gettext automake make do
     yum install -y jq && \
     yum clean all -y
 
-ENV HOME /root
+ENV HOME /root \
+    PUSH_IMAGE="true"
 
 ADD ./build.sh /tmp/build.sh
 

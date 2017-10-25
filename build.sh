@@ -11,7 +11,7 @@ IFS=$'\n\t'
 
 env | sort
 
-if [ -z "${BUILD_NAMESPACE}" ]; then
+if [ -z "$BUILD_NAMESPACE" ]; then
     BUILD_NAMESPACE=$(eval cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
 fi
 
@@ -29,4 +29,9 @@ oc login https://$KUBERNETES_PORT_443_TCP_ADDR:$KUBERNETES_SERVICE_PORT_HTTPS \
 
 COMMIT_ID=$(oc get istag $BUILD_IMAGE:latest -o json -n $BUILD_NAMESPACE | jq -r ".image.dockerImageMetadata.Config.Labels.\"io.openshift.build.commit.id\"")
 oc tag $BUILD_IMAGE:latest $BUILD_IMAGE:$COMMIT_ID -n $BUILD_NAMESPACE
-docker push $BUILD_IMAGE:$COMMIT_ID
+
+
+if [ "${PUSH_IMAGE}" = true ] ; then
+    docker push $BUILD_IMAGE:$COMMIT_ID
+fi
+
