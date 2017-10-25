@@ -55,9 +55,8 @@ fi
 #fi
 
 if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
-  docker version
-  docker login --help
-  docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}" "${OUTPUT_REGISTRY}"
+  docker --debug login -u "${DOCKER_USER}" -p "${DOCKER_PASS}" "${OUTPUT_REGISTRY}"
+  cat /root/.docker/config.json
   if [ -n "${BUILD_TAG}" ]; then
     BUILD_TAG_FINAL="${TAG}:${BUILD_TAG}"
     echo "Retagging image as ${BUILD_TAG_FINAL}"
