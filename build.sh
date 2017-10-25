@@ -34,7 +34,8 @@ COMMIT_ID=$(oc get istag $BUILD_IMAGE:latest -o json -n $BUILD_NAMESPACE | jq -r
 oc tag $BUILD_IMAGE:latest $BUILD_IMAGE:$COMMIT_ID -n $BUILD_NAMESPACE
 
 
-if [ "${PUSH_IMAGE}" = true ] ; then
+if [ "$PUSH_IMAGE" = true ] ; then
+    echo "Pushing Image"
     docker push $BUILD_IMAGE:$COMMIT_ID
 fi
 
