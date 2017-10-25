@@ -56,12 +56,11 @@ fi
 
 if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
   docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}" "${OUTPUT_REGISTRY}"
-  #docker --config="/root/.dockercfg" push "${TAG}"
   if [ -n "${BUILD_TAG}" ]; then
     BUILD_TAG_FINAL="${TAG}:${BUILD_TAG}"
     echo "Retagging image as ${BUILD_TAG_FINAL}"
     docker tag "${TAG}" "${BUILD_TAG_FINAL}"
-    #docker --config="/root/.dockercfg" push "${BUILD_TAG_FINAL}"
-    docker images
+    docker --config="/root/.dockercfg" push "${BUILD_TAG_FINAL}"
   fi
+  docker --config="/root/.dockercfg" push "${TAG}"
 fi
