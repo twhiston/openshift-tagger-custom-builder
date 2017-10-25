@@ -29,6 +29,13 @@ if [[ "${SOURCE_REPOSITORY}" != "git://"* ]] && [[ "${SOURCE_REPOSITORY}" != "gi
   fi
 fi
 
+if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e /root/.docker ]]; then
+  echo "Using push secret"
+  mkdir -p /root/.docker
+  ln -s "$PUSH_DOCKERCFG_PATH"/.dockerconfigjson /root/.docker/config.json
+  cat /root/.docker/config.json
+fi
+
 if [ -n "${SOURCE_REF}" ]; then
   BUILD_DIR=$(mktemp --directory)
   git clone --recursive "${SOURCE_REPOSITORY}" "${BUILD_DIR}"
@@ -46,13 +53,6 @@ if [ -n "${SOURCE_REF}" ]; then
   docker build --rm -t "${TAG}" "${BUILD_DIR}"
 else
   docker build --rm -t "${TAG}" "${SOURCE_REPOSITORY}"
-fi
-
-if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e /root/.docker ]]; then
-  echo "Using push secret"
-  mkdir -p /root/.docker
-  ln -s "$PUSH_DOCKERCFG_PATH"/.dockerconfigjson /root/.docker/config.json
-  cat /root/.docker/config.json
 fi
 
 if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
