@@ -55,6 +55,7 @@ if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e /root/.docker ]]; then
 fi
 
 if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
+  docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}" "${OUTPUT_REGISTRY}"
   docker --config="/root/.dockercfg" push "${TAG}"
   if [ -n "${BUILD_TAG}" ]; then
     BUILD_TAG_FINAL="${TAG}:${BUILD_TAG}"
