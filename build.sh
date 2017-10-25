@@ -36,7 +36,9 @@ oc tag $BUILD_IMAGE:latest $BUILD_IMAGE:$COMMIT_ID -n $BUILD_NAMESPACE
 
 if [ "$PUSH_IMAGE" = true ] ; then
     echo "Pushing Image"
-    docker -H "${DOCKER_SOCKET}" login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
+    if [[ -v $DEBUG ]]; then
+        echo "Docker Socket: ${DOCKER_SOCKET}"
+    fi
     docker -H "${DOCKER_SOCKET}" push $BUILD_IMAGE:$COMMIT_ID
 fi
 
