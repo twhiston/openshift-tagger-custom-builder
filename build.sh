@@ -29,12 +29,6 @@ if [[ "${SOURCE_REPOSITORY}" != "git://"* ]] && [[ "${SOURCE_REPOSITORY}" != "gi
   fi
 fi
 
-if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e /root/.docker ]]; then
-  echo "Using push secret"
-  mkdir -p ~/.docker
-  cp "$PUSH_DOCKERCFG_PATH"/.dockerconfigjson ~/.docker/config.json
-fi
-
 if [ -n "${SOURCE_REF}" ]; then
   BUILD_DIR=$(mktemp --directory)
   git clone --recursive "${SOURCE_REPOSITORY}" "${BUILD_DIR}"
@@ -54,9 +48,14 @@ else
   docker build --rm -t "${TAG}" "${SOURCE_REPOSITORY}"
 fi
 
+if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e /root/.docker ]]; then
+  echo "Using push secret"
+  mkdir -p ~/.docker
+  cp "$PUSH_DOCKERCFG_PATH"/.dockerconfigjson ~/.docker/config.json
+fi
+
 if [ -n "${OUTPUT_IMAGE}" ] || [ -s "~/.dockercfg" ]; then
   docker version
-  #docker --debug login -u "${DOCKER_USER}" -p "${DOCKER_PASS}" "${OUTPUT_REGISTRY}"
   if [ -n "${BUILD_TAG}" ]; then
     BUILD_TAG_FINAL="${TAG}:${BUILD_TAG}"
     echo "Retagging image as ${BUILD_TAG_FINAL}"
