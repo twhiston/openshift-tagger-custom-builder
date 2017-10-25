@@ -49,9 +49,9 @@ else
 fi
 
 if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e /root/.docker ]]; then
-  echo "Using push secret"
-  mkdir -p /root/.docker
-  ln -s "$PUSH_DOCKERCFG_PATH"/.dockerconfigjson /root/.docker/config.json
+  #echo "Using push secret"
+  #mkdir -p /root/.docker
+  #ln -s "$PUSH_DOCKERCFG_PATH"/.dockerconfigjson /root/.docker/config.json
 fi
 
 if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
