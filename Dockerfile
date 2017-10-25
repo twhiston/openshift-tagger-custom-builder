@@ -6,8 +6,8 @@ LABEL io.k8s.description="Custom Image Builder" \
       io.k8s.display-name="Custom Builder" \
       io.openshift.tags="builder,custom"
 
-RUN echo "Installing Build Tools" && \
-    yum install -y --enablerepo=centosplus gettext automake make docker jq && \
+RUN yum install -y --enablerepo=centosplus epel-release gettext automake make docker && \
+    yum install -y jq && \
     yum clean all -y
 
 ENV HOME /root
