@@ -11,7 +11,7 @@ IFS=$'\n\t'
 
 env | sort
 
-if [ -n "${BUILD_NAMESPACE}" ]; then
+if [ -z "${BUILD_NAMESPACE}" ]; then
     BUILD_NAMESPACE=$(eval cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
 fi
 
