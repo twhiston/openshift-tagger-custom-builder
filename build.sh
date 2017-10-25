@@ -51,7 +51,7 @@ fi
 if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e /root/.dockercfg ]]; then
   echo "Using push secret"
   ln -s "$PUSH_DOCKERCFG_PATH" /root/.dockercfg
-  ls -la /root/.dockercfg
+  ls -la "$PUSH_DOCKERCFG_PATH"
 fi
 
 if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
