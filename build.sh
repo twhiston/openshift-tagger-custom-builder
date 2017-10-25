@@ -49,6 +49,8 @@ else
 fi
 
 cp -R ${PUSH_DOCKERCFG_PATH}/ /root/.dockercfg/
+ls -la /root/.dockercfg/
+cat /root/.dockercfg/config.json
 
 if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
   docker push "${TAG}"
