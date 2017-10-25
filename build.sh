@@ -34,6 +34,9 @@ if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e /root/.docker ]]; then
   mkdir -p /root/.docker
   ln -s "$PUSH_DOCKERCFG_PATH"/.dockerconfigjson /root/.docker/config.json
   cat /root/.docker/config.json
+  ls -la /root/.docker
+  chmod 644 /root/.docker/config.json
+  ls -la /root/.docker
 fi
 
 if [ -n "${SOURCE_REF}" ]; then
