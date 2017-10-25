@@ -48,9 +48,10 @@ else
   docker build --rm -t "${TAG}" "${SOURCE_REPOSITORY}"
 fi
 
-cp -R ${PUSH_DOCKERCFG_PATH}/ /root/.dockercfg/
-ls -la /root/.dockercfg/
-cat /root/.dockercfg/config.json
+if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e /root/.dockercfg ]]; then
+  echo "Using push secret"
+  cp /var/run/secrets/openshift.io/push/.dockercfg /root/.dockercfg
+fi
 
 if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
   docker push "${TAG}"
