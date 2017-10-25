@@ -6,7 +6,10 @@ LABEL io.k8s.description="Custom Image Builder" \
       io.k8s.display-name="Custom Builder" \
       io.openshift.tags="builder,custom"
 
-RUN yum install -y --enablerepo=centosplus epel-release gettext automake make docker && \
+
+RUN yum-config-manager --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo && \
+    yum install -y --enablerepo=centosplus epel-release gettext automake make docker-ce && \
     yum install -y jq && \
     yum clean all -y
 

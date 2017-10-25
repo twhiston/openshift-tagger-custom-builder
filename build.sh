@@ -48,20 +48,20 @@ else
   docker build --rm -t "${TAG}" "${SOURCE_REPOSITORY}"
 fi
 
-#if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e /root/.docker ]]; then
-  #echo "Using push secret"
-  #mkdir -p /root/.docker
-  #ln -s "$PUSH_DOCKERCFG_PATH"/.dockerconfigjson /root/.docker/config.json
-#fi
+if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e /root/.docker ]]; then
+  echo "Using push secret"
+  mkdir -p /root/.docker
+  ln -s "$PUSH_DOCKERCFG_PATH"/.dockerconfigjson /root/.docker/config.json
+  cat /root/.docker/config.json
+fi
 
 if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
-  docker --debug login -u "${DOCKER_USER}" -p "${DOCKER_PASS}" "${OUTPUT_REGISTRY}"
-  cat /root/.docker/config.json
+  docker version
+  #docker --debug login -u "${DOCKER_USER}" -p "${DOCKER_PASS}" "${OUTPUT_REGISTRY}"
   if [ -n "${BUILD_TAG}" ]; then
     BUILD_TAG_FINAL="${TAG}:${BUILD_TAG}"
     echo "Retagging image as ${BUILD_TAG_FINAL}"
     docker tag "${TAG}" "${BUILD_TAG_FINAL}"
-
     docker --debug --config="/root/.dockercfg" push "${BUILD_TAG_FINAL}"
   fi
   docker --debug --config="/root/.dockercfg" push "${TAG}"
