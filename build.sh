@@ -61,7 +61,7 @@ if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
     echo "Retagging image as ${BUILD_TAG_FINAL}"
     docker tag "${TAG}" "${BUILD_TAG_FINAL}"
     docker info
-    docker --config="/root/.dockercfg" push "${BUILD_TAG_FINAL}" --debug
+    docker --debug --config="/root/.dockercfg" push "${BUILD_TAG_FINAL}"
   fi
-  docker --config="/root/.dockercfg" push "${TAG}" --debug
+  docker --debug --config="/root/.dockercfg" push "${TAG}"
 fi
