@@ -13,8 +13,7 @@ RUN yum-config-manager --add-repo \
     yum install -y jq && \
     yum clean all -y
 
-ENV HOME /root \
-    PUSH_IMAGE="true"
+ENV HOME /root
 
 ADD ./build.sh /tmp/build.sh
 

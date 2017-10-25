@@ -1,21 +1,16 @@
 # Tagger Custom Builder
 
-Support multiple tags for a build output
+Tested with
 
-This can be hacked together today by:
-
-1) create a custom builder image that pulls the built image and re-tags it with the commit found in the image label and pushes it
-2) define a custom build config with an image change trigger such that it gets run whenever the "real" build pushes a new image.
-
-cf https://trello.com/c/nOX8FTRq/686-5-support-multiple-tags-for-a-build-output
+- Docker Hub
 
 ## How it works
 
 ### TOKEN
 
-If you don't explicitly add a token to connect to your openshift instance then it will connect as the builder
-and you will need to ensure that the builder can see and edit your project
-`oc policy add-role-to-user edit system:serviceaccount:drupal-module-tester:builder`
+If you don't explicitly add a token to connect to your openshift instance then it will connect as the builder user
+and you will need to ensure that the builder can see and edit your project for this image to work by running
+`oc policy add-role-to-user edit system:serviceaccount:<my-project-name>:builder`
 
 ### BUILD_NAMESPACE
 
