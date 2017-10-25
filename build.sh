@@ -10,7 +10,11 @@ if [ ! -e "${DOCKER_SOCKET}" ]; then
 fi
 
 if [ -n "${OUTPUT_IMAGE}" ]; then
-  TAG="${OUTPUT_REGISTRY}/${OUTPUT_IMAGE}"
+    if [ -n "${OUTPUT_REGISTRY}" ]; then
+        TAG="${OUTPUT_REGISTRY}/${OUTPUT_IMAGE}"
+    else
+        TAG="${OUTPUT_IMAGE}"
+    fi
 fi
 
 if [[ "${SOURCE_REPOSITORY}" != "git://"* ]] && [[ "${SOURCE_REPOSITORY}" != "git@"* ]]; then
