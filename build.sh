@@ -55,8 +55,8 @@ oc login https://$KUBERNETES_PORT_443_TCP_ADDR:$KUBERNETES_SERVICE_PORT_HTTPS \
   --token "${TOKEN}" \
   --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 
-COMMIT_ID=$(oc get istag $BUILD_IMAGE:latest -o json -n $BUILD_NAMESPACE | jq -r ".image.dockerImageMetadata.Config.Labels.\"io.openshift.build.commit.id\"")
-oc tag $BUILD_IMAGE:latest $OUTPUT_IMAGE:$COMMIT_ID -n $BUILD_NAMESPACE
+#COMMIT_ID=$(oc get istag $BUILD_IMAGE:latest -o json -n $BUILD_NAMESPACE | jq -r ".image.dockerImageMetadata.Config.Labels.\"io.openshift.build.commit.id\"")
+#oc tag $BUILD_IMAGE:latest $OUTPUT_IMAGE:$COMMIT_ID -n $BUILD_NAMESPACE
 
 
 if [[ -d "$PUSH_DOCKERCFG_PATH" ]] && [[ ! -e ~/.docker ]]; then
@@ -69,9 +69,12 @@ fi
 
 
 if [ "$PUSH_IMAGE" = true ] ; then
+    # The image repo contains the full namespace of the image, which we need to tag it
     REAL_NAME=$(oc get imagestream drupal-module-tester -o json | jq -r ".status.dockerImageRepository")
+    # Tag that is used from main image is an env var which defaults to image
     BUILD_TAG=$(oc get istag $BUILD_IMAGE:latest -o json -n $BUILD_NAMESPACE | jq -r ".image.dockerImageMetadata.Config.Labels.\"${TAG_LABEL}\"")
-    BUILD_TAG=$(echo $BUILD_TAG | sed 's/[^a-zA-Z0-9\_\-]//g')
+    # Strip out anything other than alphanumerical and - _ . in image tag names
+    BUILD_TAG=$(echo $BUILD_TAG | sed 's/[^a-zA-Z0-9\.\_\-]//g')
     REAL_OUTPUT="$OUTPUT_NAMESPACE/$OUTPUT_IMAGE:$BUILD_TAG"
 
     if [ "$DEBUG" = true ]; then

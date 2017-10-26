@@ -25,49 +25,7 @@ BUILD_IMAGE is the part of your namespace before the tag eg `my-openshift-projec
 
 If true tries to push the image to the final repo name after tagging so, for example, you could publish your image on docker hub
 
-## Run it locally
-
-```
-docker run -it -e TOKEN=$(oc whoami -t) \
-               -e BUILD_NAMESPACE=<…> \
-               -e BUILD_IMAGE=<…> \
-               yamo/openshift-tagger-custom-builder
-```
 
 ## Use it on openshift
 
 To use it, you just have to add a BuildConfig that will be triggered after your build
-
-```
-- kind: BuildConfig
-  apiVersion: v1
-  metadata:
-    name: ${APPLICATION_NAME}-tagger
-    labels:
-      application: ${APPLICATION_NAME}
-  spec:
-    strategy:
-      type: Custom
-      customStrategy:
-        from:
-          # this is the builder image
-          kind: DockerImage
-          name: yamo/openshift-tagger-custom-builder
-        pullSecret:
-          name: dockercfg
-        forcePull: true
-        env:
-        - name: OPENSHIFT_INSTANCE
-          value: ${OPENSHIFT_SERVER}
-        - name: BUILD_NAMESPACE
-          value: ${APPLICATION_NAME}
-        - name: BUILD_IMAGE
-          value: ${APPLICATION_NAME}
-    triggers:
-    - type: ImageChange
-    - type: ImageChange
-      imageChange:
-        from:
-          kind: ImageStreamTag
-          name: ${APPLICATION_NAME}:latest
-```
